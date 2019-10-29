@@ -1,3 +1,8 @@
+""" Alert for any IAM activities like creating/deleting a user/role/access keys etc.
+"""
+__version__ = '1.0.0'
+__author__ = 'Pravin Singh'
+
 import raven
 import os
 
