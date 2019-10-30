@@ -11,7 +11,8 @@ setup(name='raven',
       packages=find_packages(),
       install_requires=[
           'json2html>=1.2.1',
-          'markdown2>=2.3.8'
+          'markdown2>=2.3.8',
+          'requests>=2.19.1'
       ],
       include_package_data=True,
       zip_safe=False)
