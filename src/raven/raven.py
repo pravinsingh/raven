@@ -1,7 +1,7 @@
 """ Base module for project Raven that contains the implementations of Scroll and other 
     related classes.
 """
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 __author__ = 'Pravin Singh, Govarthanan Rajappan'
 
 import boto3
@@ -127,8 +127,8 @@ class Scroll:
         """<!DOCTYPE html><html><head>
             <style>
             table {border: 1px solid papayawhip; width: 100%; border-collapse: collapse;}
-            th {text-align: left; padding-left: 5px; background-color: navajowhite;}
-            td {padding-left: 5px; background-color: floralwhite}
+            th {border: 1px solid papayawhip; text-align: left; padding-left: 5px; background-color: navajowhite;}
+            td {border: 1px solid papayawhip; padding-left: 5px; background-color: floralwhite}
             .banner {
                 border: none;
                 background: papayawhip url('""" + self.raven_bucket + """/res/scroll-banner.png') no-repeat;
@@ -208,17 +208,17 @@ class Scroll:
         except Exception as e:
             self.logger.exception(e)
 
-    def send_slack_message(self, channel, alertmsg, service, tenant):
-        if self.scroll_type.name == 'Critical':
+    def send_slack_message(self, channel, alertmsg, message_type, service, tenant):
+        if message_type.name == 'Critical':
             alertmsg = ':fire:' + alertmsg
             color = 'danger'
-        elif self.scroll_type.name == 'Info':
+        elif message_type.name == 'Info':
             alertmsg = ':white_check_mark:' + alertmsg
             color = 'good'
-        elif self.scroll_type.name == 'Alert':
+        elif message_type.name == 'Alert':
             alertmsg = ':heavy_exclamation_mark:' + alertmsg
             color = 'warning'
-        elif self.scroll_type.name == 'Report':
+        elif message_type.name == 'Report':
             alertmsg = ':bar_chart:' + alertmsg
             color = '#439FE0'
         else: 
@@ -259,7 +259,7 @@ class Scroll:
                 #"ts":calendar.timegm(time.gmtime())
             }]
         }
-        r = requests.post(url=url, data=json.dumps(payload))
+        requests.post(url=url, data=json.dumps(payload))
 
 
 def get_logger(name='', level='DEBUG'):
