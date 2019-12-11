@@ -10,7 +10,6 @@ import datetime
 import raven
 
 def handler(event, context):
-    import raven
     fromEmail = 'tibco-mdm-noreply@tibco.com' #os.environ['fromEmail']
     toEmail = 'hzhao@tibco.com' #os.environ['toEmail']
     subject = 'Backup - Broker, Storage and Logs' #os.environ['subject']  
