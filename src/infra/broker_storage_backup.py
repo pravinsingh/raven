@@ -1,5 +1,4 @@
-""" Base module for project Raven that contains the implementations of Scroll and other 
-    related classes.
+""" Storage Common Dir, Local Postgres and recent logs backup.
 """
 
 __version__ = '0.8.1'
@@ -14,7 +13,7 @@ def handler(event, context):
     import raven
     fromEmail = 'tibco-mdm-noreply@tibco.com' #os.environ['fromEmail']
     toEmail = 'hzhao@tibco.com' #os.environ['toEmail']
-    subject = 'Broker and storage backup' #os.environ['subject']  
+    subject = 'Backup - Broker, Storage and Logs' #os.environ['subject']  
     message = """    
                                    <br><b style="font-size:18px">Storage Common Dir and Local postgrebackup update</b><br>
                                         <table >
@@ -127,7 +126,6 @@ def handler(event, context):
             message_type = raven.MessageType.Html,
             message = message         
     )
-
 
 if (__name__ == "__main__"):
     handler(None, None)
