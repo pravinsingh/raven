@@ -1,7 +1,7 @@
 """ Storage Common Dir, Local Postgres and recent logs backup.
 """
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 __author__ = 'Bhupender Kumar, Ruby Zhao'
 
 import os
@@ -10,14 +10,13 @@ import datetime
 import raven
 
 def handler(event, context):
-    fromEmail = 'tibco-mdm-noreply@tibco.com' #os.environ['fromEmail']
-    toEmail = 'hzhao@tibco.com' #os.environ['toEmail']
-    subject = 'Backup - Broker, Storage and Logs' #os.environ['subject']  
+    fromEmail = 'tibco-mdm-noreply@tibco.com' 
+    toEmail = 'alerts-cloudops@tibco.com' 
+    subject = 'Backup - Broker, Storage and Logs'  
     message = """    
-                                   <br><b style="font-size:18px">Storage Common Dir and Local postgrebackup update</b><br>
+                                   <h2>Storage Common Dir and Local postgrebackup update</h2>
                                         <table >
-                                            <col style="width:25%" span="2" />
-                                        <tr style="background-color: lightgray"><th>Bucket Name</th><th>Job Update</th></tr>"""
+                                        <tr><th>Bucket Name</th><th>Job Update</th></tr>"""
 
     ssm_obj = boto3.client('ssm', region_name='us-east-1')
     resp_broker = ssm_obj.get_parameter(Name='broker-backup-buckets')
@@ -27,11 +26,8 @@ def handler(event, context):
     resp_logs = ssm_obj.get_parameter(Name='logs-backup-buckets')
     logs_buckets = resp_logs['Parameter']['Value'].split(",")
     
-    message_1 = "Bucket Name: "
-    message_2 = " file was not uploaded."
-    message_4 = "All files were uploaded successfully"   
-    message_b = "Broker Console DB backup update"
-    message_l = "Most recent Log backups"
+    message_alert = " file was not uploaded."
+    message_success = "All files were uploaded successfully"   
     alert = False
     
     s3_client = boto3.client('s3')
@@ -41,24 +37,23 @@ def handler(event, context):
     
     temp_list = []
     mid_list = []
-    not_present = []          
+           
     for s1 in storage_buckets:
         resp = s3_client.list_objects(Bucket=s1)
         for s2 in resp['Contents']:
             if s2['LastModified'].replace(tzinfo=None) > comp_date.replace(tzinfo=None):
                 temp_list.append(s2['Key'])
         for s3 in storage_files:
-            
             if any(s3 in s for s in temp_list):
                 continue
             else:
                 mid_list.append(s3)
 
         if len(mid_list) == 0:
-            message += "<tr><td>%s</td><td style=\"color:green\">%s</td></tr>" %(s1, message_4)
+            message += "<tr><td>%s</td><td style=\"color:green\">%s</td></tr>" %(s1, message_success)
         else:
             for s4 in mid_list:
-                temp_msg += s4 + message_2 + "<br>"
+                temp_msg += s4 + message_alert + "<br>"
                 alert = True
             message += "<tr><td>%s</td><td style=\"color:red\">%s</td></tr>" %(s1, temp_msg)
         temp_list = []
@@ -66,10 +61,9 @@ def handler(event, context):
         temp_msg = ""
 
     message +=  """</table><br>""" 
-    message += """<br><b style="font-size:18px">Broker Console DB backup update</b><br>"""
+    message += """<h2>Broker Console DB backup update</h2>"""
     message +=""" <table>
-                    <col style="width:25%" span="2" />
-                    <tr style="background-color: lightgray;"><th>Bucket Name</th><th>Job Update</th></tr>"""
+                    <tr><th>Bucket Name</th><th>Job Update</th></tr>"""
     for b1 in broker_buckets:
         resp = s3_client.list_objects(Bucket=b1)
         for b2 in resp['Contents']:
@@ -81,10 +75,10 @@ def handler(event, context):
             else:
                 mid_list.append(b3)
         if len(mid_list) == 0:
-            message += "<tr><td>%s</td><td style=\"color:green\">%s</td></tr>" %(b1, message_4 )
+            message += "<tr><td>%s</td><td style=\"color:green\">%s</td></tr>" %(b1, message_success )
         else:
             for b4 in mid_list:
-                temp_msg += b4 + message_2 + "<br>"
+                temp_msg += b4 + message_alert + "<br>"
                 alert = True
             message += "<tr><td>%s</td><td style=\"color:red\">%s</td></tr>" %(b1, temp_msg)
                 
@@ -92,10 +86,9 @@ def handler(event, context):
         mid_list = []
         temp_msg = ""
     message +=  """</table><br>"""
-    message += """<br><b style="font-size:20px">Most recent Log backups</b><br>"""
+    message += """<h2>Most recent Log backups</h2>"""
     message +=""" <table>
-                        <col style="width:25%" span="2" />
-                        <tr style="background-color: lightgray;"><th>Bucket Name</th><th>Logs</th></tr>"""
+                        <tr><th>Bucket Name</th><th>Logs</th></tr>"""
 
     dict1 = {}
     for l1 in logs_buckets:
