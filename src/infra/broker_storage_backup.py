@@ -1,7 +1,7 @@
 """ Storage Common Dir, Local Postgres and recent logs backup.
 """
 
-__version__ = '0.8.1'
+__version__ = '1.0.1'
 __author__ = 'Bhupender Kumar, Ruby Zhao'
 
 import os
