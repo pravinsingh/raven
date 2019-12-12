@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 """ Base module for project Raven that contains the implementations of Scroll and other 
     related classes.
 """
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 __author__ = 'Pravin Singh, Govarthanan Rajappan'
 
 import boto3
@@ -104,7 +105,7 @@ class Scroll:
         return body
 
     def _add_markdown_body(self, message):
-        body = markdown(message)
+        body = markdown(message, extras=["tables"])
         return body
 
     def _add_text_body(self, message, subject):
