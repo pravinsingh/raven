@@ -1,7 +1,7 @@
 """ Storage Common Dir, Local Postgres and recent logs backup.
 """
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = 'Bhupender Kumar, Ruby Zhao'
 
 import os
@@ -14,7 +14,7 @@ def handler(event, context):
     toEmail = 'alerts-cloudops@tibco.com' 
     subject = 'Backup - Broker, Storage and Logs'  
     message = """    
-                                   <h2>Storage Common Dir and Local postgrebackup update</h2>
+                                   <h2>Storage Common Dir and Local Postgres Backups</h2>
                                         <table >
                                         <tr><th>Bucket Name</th><th>Job Update</th></tr>"""
 
@@ -61,7 +61,7 @@ def handler(event, context):
         temp_msg = ""
 
     message +=  """</table><br>""" 
-    message += """<h2>Broker Console DB backup update</h2>"""
+    message += """<h2>Broker Console DB Backups</h2>"""
     message +=""" <table>
                     <tr><th>Bucket Name</th><th>Job Update</th></tr>"""
     for b1 in broker_buckets:
@@ -86,7 +86,7 @@ def handler(event, context):
         mid_list = []
         temp_msg = ""
     message +=  """</table><br>"""
-    message += """<h2>Most recent Log backups</h2>"""
+    message += """<h2>Most Recent Log Backups</h2>"""
     message +=""" <table>
                         <tr><th>Bucket Name</th><th>Logs</th></tr>"""
 
