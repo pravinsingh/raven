@@ -33,7 +33,7 @@ def handler(event, context):
                             comp_date = datetime.datetime.now() - datetime.timedelta(days=2)
                             for s1 in desc_snap['Snapshots']:
                                 if s1['StartTime'].replace(tzinfo=None) < comp_date.replace(tzinfo=None):
-                                    ec2_client.delete_snapshot(SnapshotId=s1['SnapshotId'], DryRun=False) # Deleting snapshots older than specified date(comp_date)
+                                    #ec2_client.delete_snapshot(SnapshotId=s1['SnapshotId'], DryRun=False) # Deleting snapshots older than specified date(comp_date)
                                     # Output message to be displayed and mailed to CloudOps
                                     message += "| %s | %s | %s | %s | %s |\n" %(r3['Value'], r2['InstanceId'], v1['Ebs']['VolumeId'], snap['SnapshotId'], s1['SnapshotId']) 
 
