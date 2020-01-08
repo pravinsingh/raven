@@ -58,7 +58,6 @@ def handler(event, context):
             not_present.append(r1)
             message += ' ' + r1 + ' ' + str_mgs + ' ''\n'
             alert=True
-    #print(not_present)
     
     if message == '':
         message += ' ' + fine_msg
