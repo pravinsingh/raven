@@ -16,6 +16,124 @@ the functions. The framework also:
 - Identifies the source of the alert (i.e. where the alert is coming from).
 - Provides integration points with different alerting systems (e.g. Email, OpsGenie, Slack *etc.*)
 
+The screenshot below shows subject lines for different notification types, and the preview pane shows how JSON data is shown in a tabular format in the
+email body:
+![image](https://user-images.githubusercontent.com/8378748/227669616-27254a44-2656-41f2-8520-48c76429350e.png)
+
+
+## Using Raven Module
+Raven can be used in two ways:
+- As a Python module in your Lambda functions, or
+- As a REST API that can be called from anywhere
+### Using Raven in Lambda functions
+Raven Python module (raven.py) can be hosted as a Lambda layer in an account. Please note that since it needs the ability to send emails using 
+Amazon SES service, it can be used only in the regions which support SES (currently N. Virginia, Oregon, and Ireland). To use this module in your 
+Lambda code, follow these steps (the steps are shown for N. Virginia region, change the region as appropriate for other regions).
+
+#### Make Raven accessible to your account
+These steps are needed only once and only if you are hosting the layer in a different account.
+
+- Get the latest version of ‘raven’ layer. To do this, connect to the account hosting the layer using AWS CLI and use this command:
+`aws lambda list-layer-versions --layer-name raven`
+This should show all the versions of ‘raven’ layer. Make a note of the latest version number and its ARN. You’d need the ARN later.
+
+![Screenshot 2023-03-24 at 4 24 52 PM](https://user-images.githubusercontent.com/8378748/227661039-b41d231a-7112-48ad-9889-6ee7cca55aa0.png)
+
+- Grant access on the latest ‘raven’ layer to your account. To do this, use this command:
+`aws lambda add-layer-version-permission --layer-name raven --statement-id <your-account-alias> --
+action lambda:GetLayerVersion \
+--principal <your-account-id> --version-number <latest-layer-version-number> --output text`
+
+If successful, this will show the json policy which was added to the layer version.
+
+![image](https://user-images.githubusercontent.com/8378748/227671082-f27476a6-7175-4681-8ee2-0505a483c267.png)
+
+#### Create your Lambda function
+- Log into AWS console of your account, go to Lambda service, and create your function. Use the runtime as Python 3.7 or Python 3.6.
+- Make sure that the execution role you chose, has the following permissions:
+    - `iam:ListAccountAliases`
+    - `ses:SendEmail`
+- On the function configuration page, click on ‘Layers’, and then on ‘Add a layer’.
+- On the Layer selection page, select ‘Provide a layer version ARN’ and provide the layer ARN that you noted down in an earlier step.
+- Click ‘Add’. The layer should now show up in the list of layers.
+- In the Lambda ‘Designer’ section, click on the function name to go back to code editor window.
+- In your code you can now import the raven module as any other Python module. Here is a sample code that uses raven to send a notification email:
+```python
+import raven
+import os
+
+json_message = {
+  "IAM Activity": {
+    "Action": "CreateAccessKey",
+    "Action Input": {
+      "userName": "user1@example.com"
+    },
+    "Action Output": {
+      "accessKey": {
+        "accessKeyId": "ABCDE12MT3UKHTPQXZY7",
+        "status": "Active",
+        "userName": "user1@example.com",
+        "createDate": "May 21, 2022 6:45:11 PM"
+      }
+    },
+    "Time": "2022-05-21T18:45:11Z",
+    "Region": "us-east-1",
+    "Done by": "user/user1@example.com"
+  }
+}
+
+markdown_message = """> A list within a blockquote:
+>
+> * Item 1
+> * Item 2
+> * Item 3
+####Sample Table
+|Heading 1| Heading 2 |\n| ----- | ----- |\n| 11111 | 22222 |\n| 1110000 | 2220000 |\n
+"""
+
+text_message = "Something somewhere failed.\nSome random one-liner text from somewhere."
+
+html_message = """
+<br><b style="font-size:18px">Database backup update</b><br>
+<table>
+<col style="width:25%" span="2" />
+<tr style="background-color: lightgray;"><th>Bucket Name</th><th>Job Update</th></tr>
+<tr><td>database-1</td><td style="color:green">All files were uploaded successfully</td></tr>
+<tr><td>database-2</td><td style="color:green">All files were uploaded successfully</td></tr>
+<tr><td>database-3</td><td style="color:red">Some files did not upload</td></tr>
+<tr><td>database-4</td><td style="color:green">All files were uploaded successfully</td></tr>
+</table>
+"""
+
+def handler(event, context):
+  scroll = raven.Scroll(raven.Severity.Info)
+  return scroll.send_email(
+  email_from = 'noreply@example.com',
+  emails_to = ['user2@example.com', 'group1@example.com'],
+  subject = "Sample email from Raven",
+  message_type = raven.MessageType.Text,
+  message = text_message
+  )
+  
+if (__name__ == "__main__"):
+handler(None, None)
+```
+
+### Using Raven as a REST API
+If you want to use Raven at a place other than Lambda functions (e.g. from Azure, or from a custom app), you can put a Lambda function
+(providing a wrapper around the Raven module) behind an API Gateway and expose it as a REST API. The API can accept all the details of the 
+email as a json object in the message body, e.g.:
+```json
+{
+  "sender" : "tibco-cloud-noreply@tibco.com",
+  "receivers" : "['pravsing@tibco.com']",
+  "severity" : "Info",
+  "message_type" : "Html",
+  "subject" : "API Gateway Test",
+  "message" : "&lt;strong&gt;Hello from Raven!&lt;/strong&gt;"
+}
+```
+
 ---
 
 **What's in the name**
