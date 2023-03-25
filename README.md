@@ -125,8 +125,8 @@ If you want to use Raven at a place other than Lambda functions (e.g. from Azure
 email as a json object in the message body, e.g.:
 ```json
 {
-  "sender" : "tibco-cloud-noreply@tibco.com",
-  "receivers" : "['pravsing@tibco.com']",
+  "sender" : "noreply@example.com",
+  "receivers" : "['user2@example.com', 'group1@example.com']",
   "severity" : "Info",
   "message_type" : "Html",
   "subject" : "API Gateway Test",
