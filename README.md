@@ -20,6 +20,13 @@ The screenshot below shows subject lines for different notification types, and t
 email body:
 ![image](https://user-images.githubusercontent.com/8378748/227669616-27254a44-2656-41f2-8520-48c76429350e.png)
 
+---
+
+**What's in the name**
+
+*The name 'Raven' is an obvious reference to the hit HBO series 'Game of Thrones'. The framework also has a class called 'Scroll' which is like an envelop for the actual message, containing other details, like where this message is coming from, what the importance level is etc. Just like in the TV series where ravens were used to send messages written on scrolls (rolled up paper), you write your 'message' on a 'scroll' and send it through 'raven'.*
+
+---
 
 ## Using Raven Module
 Raven can be used in two ways:
@@ -134,8 +141,36 @@ email as a json object in the message body, e.g.:
 }
 ```
 
----
+## Raven Classes
 
-**What's in the name**
+Raven module has 3 classes:
+### Severity
+This shows the severity level of the message. It can have one of the four values:
+- **Critical**: Should be used when we are *sure* that this message is *actionable* and needs human intervention.
+- **Info**: Should be used when we are *sure* that this message is *not actionable* and provides only information.
+- **Alert**: Should be used when we are *not sure* whether or not this message is actionable.
+- **Report**: Should be used for providing reporting outputs, *e.g.* from Lambda functions that run periodically to check for something.
 
-*The name 'Raven' is an obvious reference to the hit HBO series 'Game of Thrones'. The framework also has a class called 'Scroll' which is like an envelop for the actual message, containing other details, like where this message is coming from, what the importance level is etc. Just like in the TV series where ravens were used to send messages written on scrolls (rolled up paper), you write your 'message' on a 'scroll' and send it through 'raven'.*
+### MessageType
+This shows the type of message content. The message gets formatted according to its type:
+- A JSON message becomes a table (or nested tables). If it has only one key, the top level key becomes the table heading. The message can also be a 
+list of multiple JSONs.
+- A text message is placed inside a text box and the message subject becomes the heading.
+- An HTML message is added to the notification body 'as-is'. Should be used when you want to have your own custom formatting, *e.g.* using
+different colored text. When creating the HTML message, just create what should go inside the &lt;body&gt; tags. Outer tags like &lt;html&gt;, &lt;head&gt;,
+&lt;body&gt; etc. are automatically added.
+- A markdown message is converted to HTML.
+
+### Scroll
+Scroll is what Raven carries. It's an envelop for the actual message, containing other details, like where this message is coming from, what the 
+severity level is etc. It is the main class in Raven and has the following exposed functions:
+- `send_email(email_from, emails_to, subject, message_type, message)`
+
+Composes a notification email and sends it using AWS SES service
+    - **email_from**: email address of the sender
+    - **emails_to**: email addresses of the receivers. It should be a list, even if it has a single address inside the list.
+    - **subject**: subject line of the email
+    - **message_type**: the type of message content, should be of type MessageType
+    - **message**: the actual message
+- `send_slack_message(channel, alertmsg, service, tenant) // Still under development, do not use`
+- `send_opsgenie_alert() // Still under development, do not use`
