@@ -164,9 +164,7 @@ different colored text. When creating the HTML message, just create what should 
 ### Scroll
 Scroll is what Raven carries. It's an envelop for the actual message, containing other details, like where this message is coming from, what the 
 severity level is etc. It is the main class in Raven and has the following exposed functions:
-- `send_email(email_from, emails_to, subject, message_type, message)`
-
-Composes a notification email and sends it using AWS SES service
+- `send_email(email_from, emails_to, subject, message_type, message) //Composes a notification email and sends it using AWS SES service:`
     - **email_from**: email address of the sender
     - **emails_to**: email addresses of the receivers. It should be a list, even if it has a single address inside the list.
     - **subject**: subject line of the email
