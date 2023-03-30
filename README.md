@@ -1,7 +1,7 @@
 # raven
 Raven is a notification framework that aims to optimize and standardize various notifications coming in from cloud infrastructure. For any SRE team, part of the job is to monitor the cloud environments and notify about any suspicious activities or report progress of scheduled activities. Teams try to automate this by writing several small, independent AWS Lambda functions (or Azure functions) that get triggered by different events and send notifications in the form of emails, Slack messages, OpsGenie alerts or something similar. There are a few problems with this approach, however:
 - Every engineer composes the notification in his/her own style, so there's no uniformity.
-- Every Lambda/Azure function has the code to send emails, Slack messages etc. That's a lot of duplicate code that can be avoided.
+- Every Lambda/Azure function has the code to send emails, Slack messages *etc*. That's a lot of duplicate code that can be avoided.
 - Since there is no agreement on the message format or the severity level of notifications, some relatively minor notifications may be tagged as important while actually important notifications might get buried.
 - If too many notifications arrive, it is difficult to know at a glance which notifications require immediate attention and which ones can wait.
 - The scattered Lambda/Azure functions become difficult to manage.
@@ -9,12 +9,12 @@ Raven is a notification framework that aims to optimize and standardize various 
 
 Raven addresses these concerns by creating a consolidated notification framework that centralizes common code in a library which can be accessed by all
 the functions. The framework also:
-- Standardizes the alert subject and allows different standardized alert body templates for different content (e.g. JSON, HTML, Markdown, plain text
+- Standardizes the alert subject and allows different standardized alert body templates for different content (*e.g.* JSON, HTML, Markdown, plain text
 *etc.*)
 - Makes it easy to identify the type and priority of the alert.
 - Makes the content more readable, so that the recipient can get the gist of the alert by just a quick glance.
-- Identifies the source of the alert (i.e. where the alert is coming from).
-- Provides integration points with different alerting systems (e.g. Email, OpsGenie, Slack *etc.*)
+- Identifies the source of the alert (*i.e.* where the alert is coming from).
+- Provides integration points with different alerting systems (*e.g.* Email, OpsGenie, Slack *etc.*)
 
 The screenshot below shows subject lines for different notification types, and the preview pane shows how JSON data is shown in a tabular format in the
 email body:
@@ -77,7 +77,7 @@ json_message = {
     },
     "Action Output": {
       "accessKey": {
-        "accessKeyId": "ABCDE12MT3UKHTPQXZY7",
+        "accessKeyId": "ABCDE12MT3UKHTPQXYZ7",
         "status": "Active",
         "userName": "user1@example.com",
         "createDate": "May 21, 2022 6:45:11 PM"
@@ -115,11 +115,11 @@ html_message = """
 def handler(event, context):
   scroll = raven.Scroll(raven.Severity.Info)
   return scroll.send_email(
-  email_from = 'noreply@example.com',
-  emails_to = ['user2@example.com', 'group1@example.com'],
-  subject = "Sample email from Raven",
-  message_type = raven.MessageType.Text,
-  message = text_message
+      email_from = 'noreply@example.com',
+      emails_to = ['user2@example.com', 'group1@example.com'],
+      subject = "Sample email from Raven",
+      message_type = raven.MessageType.Text,
+      message = text_message
   )
   
 if (__name__ == "__main__"):
@@ -127,9 +127,9 @@ handler(None, None)
 ```
 
 ### Using Raven as a REST API
-If you want to use Raven at a place other than Lambda functions (e.g. from Azure, or from a custom app), you can put a Lambda function
+If you want to use Raven at a place other than Lambda functions (*e.g.* from Azure, or from a custom app), you can put a Lambda function
 (providing a wrapper around the Raven module) behind an API Gateway and expose it as a REST API. The API can accept all the details of the 
-email as a json object in the message body, e.g.:
+email as a json object in the message body, *e.g.*:
 ```json
 {
   "sender" : "noreply@example.com",
@@ -137,7 +137,7 @@ email as a json object in the message body, e.g.:
   "severity" : "Info",
   "message_type" : "Html",
   "subject" : "API Gateway Test",
-  "message" : "&lt;strong&gt;Hello from Raven!&lt;/strong&gt;"
+  "message" : "<strong>Hello from Raven!</strong>"
 }
 ```
 
@@ -158,14 +158,14 @@ list of multiple JSONs.
 - A text message is placed inside a text box and the message subject becomes the heading.
 - An HTML message is added to the notification body 'as-is'. Should be used when you want to have your own custom formatting, *e.g.* using
 different colored text. When creating the HTML message, just create what should go inside the &lt;body&gt; tags. Outer tags like &lt;html&gt;, &lt;head&gt;,
-&lt;body&gt; etc. are automatically added.
+&lt;body&gt; *etc.* are automatically added.
 - A markdown message is converted to HTML.
 
 ### Scroll
 Scroll is what Raven carries. It's an envelop for the actual message, containing other details, like where this message is coming from, what the 
-severity level is etc. It is the main class in Raven and has the following exposed functions:
-- `send_email(email_from, emails_to, subject, message_type, message) //Composes a notification email and sends it using AWS SES service:`
-    - **email_from**: email address of the sender
+severity level is *etc.* It is the main class in Raven and has the following exposed functions:
+- `send_email(email_from, emails_to, subject, message_type, message) // Composes a notification email and sends it using AWS SES service:`
+    - **email_from**: email address of the sender. It should be a verified email address (or a verified domain) in SES service in the region.
     - **emails_to**: email addresses of the receivers. It should be a list, even if it has a single address inside the list.
     - **subject**: subject line of the email
     - **message_type**: the type of message content, should be of type MessageType
